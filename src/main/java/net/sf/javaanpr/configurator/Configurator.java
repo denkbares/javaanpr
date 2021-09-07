@@ -116,6 +116,14 @@ public final class Configurator {
         Configurator.configurator = this;
     }
 
+    /**
+     * Resets the existing configurator. After this method the configurator will be reinitialized on the next read
+     * access. The existing configurator is discarded.
+     */
+    public static synchronized void reset() {
+        configurator = null;
+    }
+
     public static synchronized Configurator getConfigurator() {
         if (configurator == null) {
             try {

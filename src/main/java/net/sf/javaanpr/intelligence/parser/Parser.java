@@ -16,6 +16,15 @@
 
 package net.sf.javaanpr.intelligence.parser;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.sf.javaanpr.configurator.Configurator;
 import net.sf.javaanpr.intelligence.RecognizedPlate;
 import net.sf.javaanpr.intelligence.SyntaxAnalysisMode;
@@ -29,14 +38,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Parser {
 
@@ -93,7 +94,17 @@ public class Parser {
     public List<PlateForm> loadFromXml(InputStream inStream)
             throws ParserConfigurationException, SAXException, IOException {  // TODO javadoc
         List<PlateForm> plateForms = new ArrayList<>();
+
+        // avoid dtd verification, because the document builder parsed from a stream,
+        // not being able to resolve relative resources properly
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(false);
+        factory.setNamespaceAware(true);
+        factory.setFeature("http://xml.org/sax/features/namespaces", false);
+        factory.setFeature("http://xml.org/sax/features/validation", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
         DocumentBuilder parser = factory.newDocumentBuilder();
         Document doc = parser.parse(inStream);
         Node structureNode = doc.getDocumentElement();
